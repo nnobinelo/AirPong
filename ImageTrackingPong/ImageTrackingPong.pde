@@ -49,36 +49,36 @@ void setup() {
   size(864, 480);
 
   int cameraIdx = 0;
- 
+
   String[] cameras = Capture.list();
 
   for (int i =0; i<cameras.length; i++) {
-  if (cameras[i].contains("Logitech HD Webcam C310,size=864x480,fps=30")) {
-    cameraIdx = i;
-    break;
-  }
-  }
-
-  if (cameraIdx == 0) {
-  for (int i =0; i<cameras.length; i++) {
-    if (cameras[i].contains("size=864x480,fps=30")) {
+    if (cameras[i].contains("Logitech HD Webcam C310,size=864x480,fps=30")) {
       cameraIdx = i;
       break;
     }
   }
+
+  if (cameraIdx == 0) {
+    for (int i =0; i<cameras.length; i++) {
+      if (cameras[i].contains("size=864x480,fps=30")) {
+        cameraIdx = i;
+        break;
+      }
+    }
   }
 
   if (cameraIdx == 0) {
-  for (int i =0; i<cameras.length; i++) {
-    if (cameras[i].contains("size=1280x960,fps=30")) {
-      cameraIdx = i;
-      break;
+    for (int i =0; i<cameras.length; i++) {
+      if (cameras[i].contains("size=1280x960,fps=30")) {
+        cameraIdx = i;
+        break;
+      }
     }
-  }
   }
 
   //printArray(Capture.list());
- 
+
   feed = new Capture(this, Capture.list()[cameraIdx]);
   feed.start();
 
@@ -115,48 +115,48 @@ void draw() {
   line(3 * width / 5, 0, 3 * width / 5, height);
 
   if (run) {
-  float y1 = player1pos();
-  float y2 = player2pos();
+    float y1 = player1pos();
+    float y2 = player2pos();
 
-  stroke(pTarg1.x, pTarg1.y, pTarg1.z);
-  strokeWeight(10);
-  pad1.update(y1);
-  pad1Y = y1;
-  pad1.show();
+    stroke(pTarg1.x, pTarg1.y, pTarg1.z);
+    strokeWeight(10);
+    pad1.update(y1);
+    pad1Y = y1;
+    pad1.show();
 
-  stroke(pTarg2.x, pTarg2.y, pTarg2.z);
-  strokeWeight(10);
-  pad2.update(y2);
-  pad2Y = y2;
-  pad2.show();
+    stroke(pTarg2.x, pTarg2.y, pTarg2.z);
+    strokeWeight(10);
+    pad2.update(y2);
+    pad2Y = y2;
+    pad2.show();
 
-  p.update();
-  p.show();
+    p.update();
+    p.show();
 
-  if (p.dead) {
-    p = new Puck();
-    if (p1Score == gameEnd) {
-      gameOver(true);
+    if (p.dead) {
+      p = new Puck();
+      if (p1Score == gameEnd) {
+        gameOver(true);
+      }
+      if (p2Score == gameEnd) {
+        gameOver(false);
+      }
     }
-    if (p2Score == gameEnd) {
-      gameOver(false);
-    }
-  }
 
-  oldPad1Y = pad1Y;
-  oldPad2Y = pad2Y;
+    oldPad1Y = pad1Y;
+    oldPad2Y = pad2Y;
 
-  fill(pTarg1.x, pTarg1.y, pTarg1.z, 200);
-  text(str(p1Score), width/2-30, 40);
-  fill(pTarg2.x, pTarg2.y, pTarg2.z, 200);
-  text(str(p2Score), width/2+30, 40);
+    fill(pTarg1.x, pTarg1.y, pTarg1.z, 200);
+    text(str(p1Score), width/2-30, 40);
+    fill(pTarg2.x, pTarg2.y, pTarg2.z, 200);
+    text(str(p2Score), width/2+30, 40);
   } else {
-  image(feed, 0, 0);
+    image(feed, 0, 0);
   }
 
   if (displayColor) {
-  fill(col2Display);
-  rect(0, 0, 100, 100);
+    fill(col2Display);
+    rect(0, 0, 100, 100);
   }
 }
 
@@ -168,28 +168,13 @@ float player1pos() {
 
   scanY1 = yAvg1;
   if (yAvg1 > height - scanThresh) {
-  scanY1 = height - scanThresh;
+    scanY1 = height - scanThresh;
   }
   if (yAvg1 < scanThresh) {
-  scanY1 = scanThresh;
+    scanY1 = scanThresh;
   }
 
   for (int y = int(scanY1 - scanThresh); y < int(scanY1 + scanThresh); y+=pixelsSkipped) {
-  for (int x = 0; x < 2 * feed.width / 5; x+=pixelsSkipped) {
-    int index = x + y * feed.width;
-    color value = 0;
-    value = feed.pixels[index];
-    PVector pVal = new PVector(red(value), green(value), blue(value));
-    if (PVector.dist(pVal, pTarg1) < thresh) {
-      passed++;
-      yTotal += y;
-      ellipse(x, y, pixelsSkipped, pixelsSkipped);
-    }
-  }
-  }
-
-  if (passed < 3) {
-  for (int y = 0; y < height; y+=pixelsSkipped) {
     for (int x = 0; x < 2 * feed.width / 5; x+=pixelsSkipped) {
       int index = x + y * feed.width;
       color value = 0;
@@ -202,10 +187,25 @@ float player1pos() {
       }
     }
   }
+
+  if (passed < 3) {
+    for (int y = 0; y < height; y+=pixelsSkipped) {
+      for (int x = 0; x < 2 * feed.width / 5; x+=pixelsSkipped) {
+        int index = x + y * feed.width;
+        color value = 0;
+        value = feed.pixels[index];
+        PVector pVal = new PVector(red(value), green(value), blue(value));
+        if (PVector.dist(pVal, pTarg1) < thresh) {
+          passed++;
+          yTotal += y;
+          ellipse(x, y, pixelsSkipped, pixelsSkipped);
+        }
+      }
+    }
   }
 
   if (passed != 0) {
-  yAvg1 = yTotal / passed;
+    yAvg1 = yTotal / passed;
   }
   return yAvg1;
 }
@@ -219,27 +219,12 @@ float player2pos() {
   stroke(0);
 
   if (yAvg2 > height - scanThresh) {
-  scanY2 = height - scanThresh;
+    scanY2 = height - scanThresh;
   }
   if (yAvg2 < scanThresh) {
-  scanY2 = scanThresh;
+    scanY2 = scanThresh;
   }
   for (int y = int(scanY2 - scanThresh); y < int(scanY2 + scanThresh); y+=pixelsSkipped) {
-  for (int x = 3 * feed.width / 5; x < feed.width; x+=pixelsSkipped) {
-    int index = x + y * feed.width;
-    color value = 0;
-    value = feed.pixels[index];
-    PVector pVal = new PVector(red(value), green(value), blue(value));
-    if (PVector.dist(pVal, pTarg2) < thresh) {
-      passed++;
-      yTotal += y;
-      ellipse(x, y, pixelsSkipped, pixelsSkipped);
-    }
-  }
-  }
-
-  if (passed < 3) {
-  for (int y = 0; y < feed.height; y+=pixelsSkipped) {
     for (int x = 3 * feed.width / 5; x < feed.width; x+=pixelsSkipped) {
       int index = x + y * feed.width;
       color value = 0;
@@ -252,10 +237,25 @@ float player2pos() {
       }
     }
   }
+
+  if (passed < 3) {
+    for (int y = 0; y < feed.height; y+=pixelsSkipped) {
+      for (int x = 3 * feed.width / 5; x < feed.width; x+=pixelsSkipped) {
+        int index = x + y * feed.width;
+        color value = 0;
+        value = feed.pixels[index];
+        PVector pVal = new PVector(red(value), green(value), blue(value));
+        if (PVector.dist(pVal, pTarg2) < thresh) {
+          passed++;
+          yTotal += y;
+          ellipse(x, y, pixelsSkipped, pixelsSkipped);
+        }
+      }
+    }
   }
 
   if (passed != 0) {
-  yAvg2 = yTotal / passed;
+    yAvg2 = yTotal / passed;
   }
   return yAvg2;
 }
@@ -263,67 +263,67 @@ float player2pos() {
 void mousePressed() {
   if (!run)
   {
-  if (gameOverScreenOn)
-  {   
-    background(0);
-    loop();
+    if (gameOverScreenOn)
+    {   
+      background(0);
+      loop();
 
-    p1Score = 0;
-    p2Score = 0;
+      p1Score = 0;
+      p2Score = 0;
 
-    gameOverScreenOn = false;
-  } else
-  {    
-    if (playersRdy==0)
-    {
-      target1 = get(mouseX, mouseY);
-      println("TARGET 1: ACQUIRED");
-      pTarg1 = new PVector(red(target1), green(target1), blue(target1));
-      pad1 = new Paddle(pad1X, padLength, color(pTarg1.x, pTarg1.y, pTarg1.z), sw);
+      gameOverScreenOn = false;
+    } else
+    {    
+      if (playersRdy==0)
+      {
+        target1 = get(mouseX, mouseY);
+        println("TARGET 1: ACQUIRED");
+        pTarg1 = new PVector(red(target1), green(target1), blue(target1));
+        pad1 = new Paddle(pad1X, padLength, color(pTarg1.x, pTarg1.y, pTarg1.z), sw);
 
-      col2Display = color(pTarg1.x, pTarg1.y, pTarg1.z);
-      displayColor = true;
+        col2Display = color(pTarg1.x, pTarg1.y, pTarg1.z);
+        displayColor = true;
 
-      new java.util.Timer().schedule(new java.util.TimerTask() {
-        @Override
-          public void run() {
-          displayColor = false;
+        new java.util.Timer().schedule(new java.util.TimerTask() {
+          @Override
+            public void run() {
+            displayColor = false;
+          }
         }
-      }
-      , 1000);
+        , 1000);
 
-      playersRdy++;
-    } else if (playersRdy == 1)
-    {
-      target2 = get(mouseX, mouseY);
-      println("TARGET 2: ACQUIRED");
-      pTarg2 = new PVector(red(target2), green(target2), blue(target2));
-      pad2 = new Paddle(pad2X, padLength, color(pTarg2.x, pTarg2.y, pTarg2.z), sw);
+        playersRdy++;
+      } else if (playersRdy == 1)
+      {
+        target2 = get(mouseX, mouseY);
+        println("TARGET 2: ACQUIRED");
+        pTarg2 = new PVector(red(target2), green(target2), blue(target2));
+        pad2 = new Paddle(pad2X, padLength, color(pTarg2.x, pTarg2.y, pTarg2.z), sw);
 
-      col2Display = color(pTarg2.x, pTarg2.y, pTarg2.z);
-      displayColor = true;
+        col2Display = color(pTarg2.x, pTarg2.y, pTarg2.z);
+        displayColor = true;
 
-      playersRdy++;
+        playersRdy++;
 
-      new java.util.Timer().schedule(new java.util.TimerTask() {
-        @Override
-          public void run() {
-          displayColor = false;
+        new java.util.Timer().schedule(new java.util.TimerTask() {
+          @Override
+            public void run() {
+            displayColor = false;
+          }
         }
-      }
-      , 1000);
+        , 1000);
 
-      run = true;
+        run = true;
+      }
     }
-  }
   }
 }
 
 void keyPressed() {
   if (run) {
-  run = false;
-  playersRdy = 0;
-  //recalibrate = true;
+    run = false;
+    playersRdy = 0;
+    //recalibrate = true;
   }
 }
 
@@ -334,9 +334,9 @@ void gameOver(boolean bool) {
   String s;
   fill(0);
   if (bool == true) {
-  s = "Player 1 Wins!";
+    s = "Player 1 Wins!";
   } else {
-  s = "Player 2 Wins!";
+    s = "Player 2 Wins!";
   }
   text("GAME OVER.", width/2, height/2);
   textSize(75);
