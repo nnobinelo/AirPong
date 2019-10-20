@@ -1,2 +1,2 @@
 # AirPong
-Computer Vision Pong Game Built w/ Processing GL/IDE
+2019 UMass Hackathon Project. Computer vision pong game built w/ Processing GL/IDE.
